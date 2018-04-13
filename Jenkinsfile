@@ -8,7 +8,7 @@ pipeline {
     }
     stage('build') {
       steps {
-        build 'edrive_api_build'
+        build 'edirve-api/job/edrive_api_build'
       }
     }
   }
