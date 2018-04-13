@@ -3,17 +3,17 @@ pipeline {
   stages {
     stage('build source') {
       steps {
-        build '/edrive-api/01. edrive_api_build_source'
+        build(job: '/edrive-api/01. edrive_api_build_source', propagate: true)
       }
     }
     stage('make base image') {
       steps {
-        build '/edrive-api/02. edrive_api_image_base'
+        build(job: '/edrive-api/02. edrive_api_image_base', propagate: true)
       }
     }
     stage('make develop image') {
       steps {
-        build '/edrive-api/03. edrive_api_image_develop'
+        build(job: '/edrive-api/03. edrive_api_image_develop', propagate: true)
       }
     }
   }
