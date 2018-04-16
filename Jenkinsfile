@@ -42,12 +42,12 @@ echo $get-login'''
         }
       }
     }
-    stage('build image') {
+    stage('create image') {
       steps {
-        sh '''ECR_REGISTRY=595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-base/repo
-cd $DOCKER_FILE/base
-docker build -t $ECR_REGISTRY:latest  --pull=true .
-docker push $ECR_REGISTRY:latest'''
+        sh '''ECR_REGISTRY=95483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo
+cd $DOCKER_FILE/edrive
+docker build -t $ECR_REGISTRY:dev --pull=true .
+docker push $ECR_REGISTRY:dev'''
       }
     }
   }
