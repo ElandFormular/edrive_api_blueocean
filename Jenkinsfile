@@ -22,7 +22,10 @@ pipeline {
       steps {
         node(label: 'edrive_api_node') {
           ws(dir: '/home/ec2-user/jenkins/workspace/edrive-api') {
-            sh 'mvn --version'
+            sh '''pwd
+echo $WORKSPACE
+cd ./edrive-api/trunk/edrive-api/
+mvn clean -Pdev -Dmaven.test.skip=true package'''
           }
 
         }
