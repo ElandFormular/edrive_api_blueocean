@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+      node {
+          label 'edrive_api_node'
+          customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
+      }
+  }
   stages {
     stage('pull source') {
       steps {
