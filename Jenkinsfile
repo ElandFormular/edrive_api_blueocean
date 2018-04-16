@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('pull source and build') {
+    stage('pull source') {
       steps {
         ansiColor(colorMapName: 'xterm') {
           timestamps() {
@@ -12,6 +12,18 @@ pipeline {
 
             }
 
+          }
+
+        }
+
+      }
+    }
+    stage('build') {
+      steps {
+        tool 'maven'
+        node(label: 'edrive_api_node') {
+          ws(dir: '/home/ec2-user/jenkins/workspace/edrive-api') {
+            sh 'mvn --version'
           }
 
         }
