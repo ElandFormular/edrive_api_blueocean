@@ -4,7 +4,9 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
-
+  }
+  parameters {
+    string(name: 'docker_tag', defaultValue: 'latest', description: 'Edrive Docker Image Tag?')
   }
   stages {
     stage('pull source') {
@@ -48,8 +50,8 @@ echo $get-login'''
       }
       steps {
         sh '''cd $DOCKER_FILE/base
-docker build -t $ECR_REGISTRY:latest  --pull=true .
-docker push $ECR_REGISTRY:latest'''
+docker build -t $ECR_REGISTRY:$docker_tag  --pull=true .
+docker push $ECR_REGISTRY:$docker_tag'''
       }
     }
   }
