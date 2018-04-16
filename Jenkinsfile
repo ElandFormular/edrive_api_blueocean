@@ -4,6 +4,7 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
+
   }
   stages {
     stage('pull source') {
