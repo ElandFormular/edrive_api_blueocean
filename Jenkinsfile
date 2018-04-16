@@ -43,11 +43,13 @@ echo $get-login'''
       }
     }
     stage('base image') {
+      environment {
+        ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-base/repo'
+      }
       steps {
-        sh '''REGISTRY=595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-base/repo
-cd $DOCKER_FILE/base
-docker build -t $REGISTRY:latest  --pull=true .
-docker push $REGISTRY:latest'''
+        sh '''cd $DOCKER_FILE/base
+docker build -t $ECR_REGISTRY:latest  --pull=true .
+docker push $ECR_REGISTRY:latest'''
       }
     }
   }
