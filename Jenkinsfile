@@ -16,5 +16,10 @@ pipeline {
         build(job: '/edrive-api/03. edrive_api_image_develop', propagate: true)
       }
     }
+    stage('') {
+      steps {
+        sleep 1
+      }
+    }
   }
 }
