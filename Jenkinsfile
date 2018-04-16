@@ -1,24 +1,15 @@
 pipeline {
   agent any
   stages {
-    stage('build source') {
+    stage('pull source and build') {
       steps {
-        build(job: '/edrive-api/01. edrive_api_build_source', propagate: true)
-      }
-    }
-    stage('make base image') {
-      steps {
-        build(job: '/edrive-api/02. edrive_api_image_base', propagate: true)
-      }
-    }
-    stage('make develop image') {
-      steps {
-        build(job: '/edrive-api/03. edrive_api_image_develop', propagate: true)
-      }
-    }
-    stage('') {
-      steps {
-        sleep 1
+        ansiColor(colorMapName: 'xterm') {
+          node(label: 'edrive_api_node') {
+            git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'develop', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
+          }
+
+        }
+
       }
     }
   }
