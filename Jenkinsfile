@@ -24,7 +24,7 @@ pipeline {
           ws(dir: '/home/ec2-user/jenkins/workspace/edrive-api') {
             sh '''echo $M2
 cd $WORKSPACE/trunk/edrive-api/
-$M2/mvn clean -Pdev -Dmaven.test.skip=true package'''
+$M2_HOME/mvn clean -Pdev -Dmaven.test.skip=true package'''
           }
 
         }
@@ -34,7 +34,6 @@ $M2/mvn clean -Pdev -Dmaven.test.skip=true package'''
   }
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
-    M2_HOME = '/usr/local/maven'
-    M2 = '$M2_HOME/bin'
+    M2_HOME = '/usr/local/maven/bin'
   }
 }
