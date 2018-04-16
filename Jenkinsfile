@@ -22,7 +22,10 @@ pipeline {
       steps {
         node(label: 'edrive_api_node') {
           ws(dir: '/home/ec2-user/jenkins/workspace/edrive-api') {
-            sh '''cd $WORKSPACE/trunk/edrive-api/
+            sh '''echo $JAVA_HOME
+echo $M2_HOME
+
+cd $WORKSPACE/trunk/edrive-api/
 mvn clean -Pdev -Dmaven.test.skip=true package'''
           }
 
@@ -30,5 +33,10 @@ mvn clean -Pdev -Dmaven.test.skip=true package'''
 
       }
     }
+  }
+  environment {
+    JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
+    M2_HOME = '/usr/local/maven'
+    M2 = '$M2_HOME/bin'
   }
 }
