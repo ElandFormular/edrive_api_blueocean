@@ -21,7 +21,7 @@ $M2_HOME/mvn clean -Dspring.profiles.active=dev test'''
     stage('build') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean-Dspring.profiles.active=dev -Dmaven.test.skip=true package'''
+$M2_HOME/mvn clean -Dspring.profiles.active=dev -Dmaven.test.skip=true package'''
       }
     }
     stage('prepare to upload') {
