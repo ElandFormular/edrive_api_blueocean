@@ -5,12 +5,6 @@ pipeline {
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
   }
-  input {
-    message "Docker Image Tag"
-    parameters {
-      string(name: 'TAG', defaultValue: 'latest', description: 'Edrive Docker Image Tag?')
-    }
-  }
   stages {
     stage('pull source') {
       steps {
