@@ -20,10 +20,9 @@ pipeline {
     }
     stage('build') {
       steps {
-        tool 'maven'
         node(label: 'edrive_api_node') {
           ws(dir: '/home/ec2-user/jenkins/workspace/edrive-api') {
-            sh 'mvn --version'
+            build '/edrive-api/01. edrive_api_build_source'
           }
 
         }
