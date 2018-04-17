@@ -4,7 +4,9 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
-
+  }
+  triggers {
+    cron('H/5 * * * *')
   }
   stages {
     stage('pull source') {
