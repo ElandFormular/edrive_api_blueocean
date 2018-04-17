@@ -42,11 +42,21 @@ echo $get-login'''
         }
       }
     }
-    stage('create image') {
-      steps {
-        sh '''cd $DOCKER_FILE
+    stage('prepare to new') {
+      parallel {
+        stage('create image') {
+          steps {
+            sh '''cd $DOCKER_FILE
 docker build -t $ECR_REGISTRY:dev --pull=true -f ./edrive/Dockerfile ./
 docker push $ECR_REGISTRY:dev'''
+          }
+        }
+        stage('stop container') {
+          steps {
+            sh '''docker stop edrive-api-dev
+docker rm -f edrive-api-dev'''
+          }
+        }
       }
     }
     stage('start container') {
