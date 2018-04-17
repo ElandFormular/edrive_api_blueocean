@@ -40,6 +40,13 @@ echo $get-login'''
             sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/develop/"'
           }
         }
+        stage('tag old image') {
+          steps {
+            sh '''docker rmi $ECR_REGISTRY:old
+docker tag $ECR_REGISTRY:dev $ECR_REGISTRY:old
+docker rmi $ECR_REGISTRY:dev'''
+          }
+        }
       }
     }
     stage('prepare to new') {
@@ -47,7 +54,7 @@ echo $get-login'''
         stage('create image') {
           steps {
             sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY:dev --pull=true -f ./edrive/Dockerfile ./
+docker build -t $ECR_REGISTRY:dev --force-rm=false --pull=true -f ./edrive/Dockerfile ./
 docker push $ECR_REGISTRY:dev'''
           }
         }
