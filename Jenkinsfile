@@ -9,19 +9,19 @@ pipeline {
   stages {
     stage('pull source') {
       steps {
-        git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'develop', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
+        git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'master', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
       }
     }
     stage('junit test') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=dev test'''
+$M2_HOME/mvn clean -Dspring.profiles.active=prod test'''
       }
     }
     stage('build source') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=dev -Dmaven.test.skip=true package'''
+$M2_HOME/mvn clean -Dspring.profiles.active=prod -Dmaven.test.skip=true package'''
       }
     }
     stage('prepare to upload') {
@@ -37,49 +37,29 @@ echo $get-login'''
         }
         stage('move war file') {
           steps {
-            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/develop/"'
+            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/production/"'
           }
         }
         stage('tag old image') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY:old || EXIT_CODE=$? && true ;
+            sh '''docker rmi $ECR_REGISTRY:prd-old || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker tag $ECR_REGISTRY:dev $ECR_REGISTRY:old || EXIT_CODE=$? && true ;
+docker tag $ECR_REGISTRY:prd $ECR_REGISTRY:prd-old || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker rmi $ECR_REGISTRY:dev || EXIT_CODE=$? && true ;
-echo $EXIT_COD
+docker rmi $ECR_REGISTRY:prd || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
 '''
           }
         }
       }
     }
-    stage('prepare to new') {
-      parallel {
-        stage('create image') {
-          steps {
-            sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY:dev --force-rm=false --pull=true -f ./edrive/Dockerfile ./
-docker push $ECR_REGISTRY:dev'''
-          }
-        }
-        stage('stop container') {
-          steps {
-            sh '''docker stop edrive-api-dev
-docker rm -f edrive-api-dev'''
-          }
-        }
-      }
-    }
-    stage('start container') {
+    stage('create image') {
       steps {
-        sh 'docker run -it -d -p 8080:8080 --name edrive-api-dev $ECR_REGISTRY:dev'
-      }
-    }
-    stage('start tomcat') {
-      steps {
-        sh 'docker exec -i edrive-api-dev /usr/local/tomcat/bin/catalina.sh start'
+        sh '''cd $DOCKER_FILE
+docker build -t $ECR_REGISTRY:prd --force-rm=false --pull=true -f ./edrive/Dockerfile ./
+docker push $ECR_REGISTRY:prd'''
       }
     }
   }
