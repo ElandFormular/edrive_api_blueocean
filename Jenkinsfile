@@ -4,6 +4,7 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
+
   }
   triggers {
     pollSCM('H * * * *')
@@ -92,4 +93,5 @@ docker rm -f edrive-api-dev'''
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
     BUILD_TYPE = 'dev'
   }
+
 }
