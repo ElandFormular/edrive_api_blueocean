@@ -37,7 +37,7 @@ echo $get-login'''
         }
         stage('move war file') {
           steps {
-            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/source/develop/"'
+            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/develop/"'
           }
         }
       }
@@ -45,8 +45,8 @@ echo $get-login'''
     stage('create image') {
       steps {
         sh '''ECR_REGISTRY=95483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo
-cd $DOCKER_FILE/edrive
-docker build -t $ECR_REGISTRY:dev --pull=true .
+cd $DOCKER_FILE
+docker build -t $ECR_REGISTRY:dev --pull=true -f ./edrive/Dockerfile ./
 docker push $ECR_REGISTRY:dev'''
       }
     }
