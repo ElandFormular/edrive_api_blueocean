@@ -12,7 +12,7 @@ pipeline {
         git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'develop', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
       }
     }
-    stage('test source') {
+    stage('junit test') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
 $M2_HOME/mvn clean -Dspring.profiles.active=dev test'''
@@ -44,10 +44,19 @@ echo $get-login'''
     }
     stage('create image') {
       steps {
-        sh '''ECR_REGISTRY=595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo
-cd $DOCKER_FILE
+        sh '''cd $DOCKER_FILE
 docker build -t $ECR_REGISTRY:dev --pull=true -f ./edrive/Dockerfile ./
 docker push $ECR_REGISTRY:dev'''
+      }
+    }
+    stage('start container') {
+      steps {
+        sh 'docker run -it -d -p 8080:8080 --name edrive-api-dev $ECR_REGISTRY:dev'
+      }
+    }
+    stage('start tomcat') {
+      steps {
+        sh 'docker exec -i edrive-api-dev /usr/local/tomcat/bin/catalina.sh start'
       }
     }
   }
@@ -55,5 +64,6 @@ docker push $ECR_REGISTRY:dev'''
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
     M2_HOME = '/usr/local/maven/bin'
     DOCKER_FILE = '/home/ec2-user/docker'
+    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
   }
 }
