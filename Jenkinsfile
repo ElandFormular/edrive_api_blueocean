@@ -4,9 +4,7 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
-  }
-  triggers {
-    cron('H/5 * * * *')
+
   }
   stages {
     stage('pull source') {
@@ -91,5 +89,8 @@ docker rm -f edrive-api-dev'''
     DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
     BUILD_TYPE = 'dev'
+  }
+  triggers {
+    cron('H/5 * * * *')
   }
 }
