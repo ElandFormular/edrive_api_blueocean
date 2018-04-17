@@ -42,9 +42,15 @@ echo $get-login'''
         }
         stage('tag old image') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY:old
-docker tag $ECR_REGISTRY:dev $ECR_REGISTRY:old
-docker rmi $ECR_REGISTRY:dev'''
+            sh '''docker rmi $ECR_REGISTRY:old || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+docker tag $ECR_REGISTRY:dev $ECR_REGISTRY:old || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+docker rmi $ECR_REGISTRY:dev || EXIT_CODE=$? && true ;
+echo $EXIT_COD
+'''
           }
         }
       }
