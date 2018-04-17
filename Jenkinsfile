@@ -6,10 +6,6 @@ pipeline {
     }
 
   }
-
-  triggers {
-    pollSCM('H/5 * * * *')
-  }
   stages {
     stage('pull source') {
       steps {
@@ -94,5 +90,7 @@ docker rm -f edrive-api-dev'''
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
     BUILD_TYPE = 'dev'
   }
-
+  triggers {
+    pollSCM('H/5 * * * *')
+  }
 }
