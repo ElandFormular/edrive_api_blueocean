@@ -12,12 +12,6 @@ pipeline {
         git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'master', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
       }
     }
-    stage('junit test') {
-      steps {
-        sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE test'''
-      }
-    }
     stage('build source') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
