@@ -60,30 +60,28 @@ docker push $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}'''
         }
         stage('stop container') {
           steps {
-            sh '''docker stop edrive-api-dev
-docker rm -f edrive-api-dev'''
+            sh '''docker stop $CONTAINER_NAME || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+if($EXIT_CODE -e 0)
+then
+ echo "delete old container"
+ docker rm -f $CONTAINER_NAME
+fi
+'''
           }
         }
       }
     }
     stage('start container') {
-      parallel {
-        stage('start container') {
-          steps {
-            sh 'docker run -it -d -p 8080:8080 --name edrive-api-dev $ECR_REGISTRY/$ECR_REPO:dev'
-          }
-        }
-        stage('') {
-          steps {
-            sh '''IMAGES_TO_DELETE=$( aws ecr list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
-aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
-          }
-        }
+      steps {
+        sh 'docker run -it -d -p 8080:8080 --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:dev'
       }
     }
-    stage('start tomcat') {
+    stage('delete untagged') {
       steps {
-        sh 'docker exec -i edrive-api-dev /usr/local/tomcat/bin/catalina.sh start'
+        sh '''IMAGES_TO_DELETE=$( aws ecr list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
+aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
       }
     }
   }
@@ -94,6 +92,7 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'dev'
     ECR_REPO = 'eland-dev-edrive-api/repo'
+    CONTAINER_NAME = 'edrive-api-dev'
   }
   triggers {
     pollSCM('H/5 * * * *')
