@@ -36,13 +36,13 @@ echo $get-login'''
         }
         stage('tag old image') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
+            sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker tag $ECR_REGISTRY:${BUILD_TYPE} $ECR_REGISTRY:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
+docker tag $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker rmi $ECR_REGISTRY:${BUILD_TYPE} || EXIT_CODE=$? && true ;
+docker rmi $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 '''
           }
@@ -52,8 +52,8 @@ echo $EXIT_CODE
     stage('create image') {
       steps {
         sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY:${BUILD_TYPE} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./
-docker push $ECR_REGISTRY:${BUILD_TYPE}'''
+docker build -t $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./
+docker push $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}'''
       }
     }
     stage('delete untagged') {
@@ -67,7 +67,8 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
     M2_HOME = '/usr/local/maven/bin'
     DOCKER_FILE = '/home/ec2-user/docker'
-    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
+    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'prod'
+    ECR_REPO = 'eland-dev-edrive-api/repo'
   }
 }
