@@ -71,7 +71,8 @@ echo $EXIT_CODE
     }
     stage('start container') {
       steps {
-        sh 'docker run -it -d -p 8080:8080 --volumes-from $CONTAINER_NAME --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:dev'
+        sh '''docker create --name ${CONTAINER_NAM}-img
+docker run -it -d -p 8080:8080 --volumes-from ${CONTAINER_NAM}-img --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:dev'''
       }
     }
     stage('delete untagged') {
