@@ -56,6 +56,12 @@ docker build -t $ECR_REGISTRY:${BUILD_TYPE} --force-rm=false --pull=true --build
 docker push $ECR_REGISTRY:${BUILD_TYPE}'''
       }
     }
+    stage('delete untagged') {
+      steps {
+        sh '''IMAGES_TO_DELETE=$( aws ecr list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
+aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
+      }
+    }
   }
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
