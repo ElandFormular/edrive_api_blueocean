@@ -71,7 +71,7 @@ echo $EXIT_CODE
     }
     stage('start container') {
       steps {
-        sh 'docker run -it -d -p 8080:8080 --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:dev'
+        sh 'docker run -it -d -p 8080:8080 --volumes-from /home/ec2-user/volume --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:dev'
       }
     }
     stage('delete untagged') {
