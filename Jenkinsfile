@@ -62,12 +62,8 @@ docker push $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}'''
           steps {
             sh '''docker stop $CONTAINER_NAME || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
-
-if($EXIT_CODE -e 0)
-then
- echo "delete old container"
- docker rm -f $CONTAINER_NAME
-fi
+docker rm -f $CONTAINER_NAME || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
 '''
           }
         }
