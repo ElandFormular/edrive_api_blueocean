@@ -60,9 +60,9 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
     M2_HOME = '/usr/local/maven/bin'
     DOCKER_FILE = '/home/ec2-user/docker'
-    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
+    ECR_REGISTRY = '024204912394.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'prod'
-    ECR_REPO = 'eland-dev-edrive-api/repo'
-    TAG = 'latest'
+    ECR_REPO = 'edrive-api-prd/repo'
+    TAG = 'staging'
   }
 }
