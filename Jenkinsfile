@@ -48,7 +48,7 @@ echo $EXIT_COD
         stage('create image') {
           steps {
             sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
+docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
           }
         }
         stage('stop container') {
