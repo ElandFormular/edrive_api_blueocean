@@ -20,15 +20,6 @@ $M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true p
     }
     stage('prepare to upload') {
       parallel {
-        stage('login for aws') {
-          steps {
-            sh '''getToken=$(aws ecr get-login --no-include-email --region ap-northeast-2)
-
-getLogin=$($getToken)
-
-echo $get-login'''
-          }
-        }
         stage('move war file') {
           steps {
             sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/${BUILD_TYPE}/"'
@@ -48,8 +39,7 @@ echo $EXIT_COD
         stage('create image') {
           steps {
             sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./
-docker push $ECR_REGISTRY/$ECR_REPO:latest'''
+docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
           }
         }
         stage('stop container') {
@@ -73,7 +63,7 @@ echo $EXIT_CODE
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
     M2_HOME = '/usr/local/maven/bin'
     DOCKER_FILE = '/home/ec2-user/docker'
-    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
+    ECR_REGISTRY = ''
     BUILD_TYPE = 'dev'
     ECR_REPO = 'eland-dev-edrive-api/repo'
     CONTAINER_NAME = 'edrive-api-dev'
