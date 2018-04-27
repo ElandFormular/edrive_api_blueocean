@@ -62,7 +62,7 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = '024204912394.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'prod'
-    ECR_REPO = 'edrive-api-prd/repo'
+    ECR_REPO = 'edrive-api-stage/repo'
     TAG = 'staging'
   }
 }
