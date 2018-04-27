@@ -7,17 +7,6 @@ pipeline {
 
   }
   stages {
-    stage('pull source') {
-      steps {
-        git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'master', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
-      }
-    }
-    stage('build source') {
-      steps {
-        sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
-      }
-    }
     stage('prepare to upload') {
       parallel {
         stage('login for aws') {
@@ -29,31 +18,24 @@ getLogin=$($getToken)
 echo $get-login'''
           }
         }
-        stage('move war file') {
-          steps {
-            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/${BUILD_TYPE}/"'
-          }
-        }
         stage('tag old image') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
+            sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker tag $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}-old || EXIT_CODE=$? && true ;
+docker tag $ECR_REGISTRY/$ECR_REPO:staging $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
 echo $EXIT_CODE
 
-docker rmi $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} || EXIT_CODE=$? && true ;
-echo $EXIT_CODE
-'''
+docker tag $ECR_REGISTRY/$ECR_REPO:latest $ECR_REGISTRY/$ECR_REPO:$TAG || EXIT_CODE=$? && true ;
+echo $EXIT_CODE'''
           }
         }
       }
     }
     stage('create image') {
       steps {
-        sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./
-docker push $ECR_REGISTRY/$ECR_REPO:${BUILD_TYPE}'''
+        sh '''docker push $ECR_REGISTRY/$ECR_REPO:latest
+docker push $ECR_REGISTRY/$ECR_REPO:$TAG'''
       }
     }
     stage('delete untagged') {
@@ -70,5 +52,6 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'prod'
     ECR_REPO = 'eland-dev-edrive-api/repo'
+    TAG = '1.0'
   }
 }
