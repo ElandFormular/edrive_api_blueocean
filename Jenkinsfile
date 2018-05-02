@@ -49,6 +49,11 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:${TAG} --force-rm=false --pull=true --bu
 docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
       }
     }
+    stage('deploy new image') {
+      steps {
+        sh 'aws ecs update-service --cluster edrive-api-stage-cluster --service edrive-api-stage-service --force-new-deployment'
+      }
+    }
     stage('delete untagged') {
       steps {
         sh '''IMAGES_TO_DELETE=$( aws ecr list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
