@@ -34,7 +34,7 @@ echo $EXIT_COD
         }
         stage('docker login') {
           steps {
-            sh '''getToken=$(aws ecr get-login --no-include-email --region ap-northeast-2 --profile edrive-dev)
+            sh '''getToken=$(aws --profile edrive-dev ecr get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
