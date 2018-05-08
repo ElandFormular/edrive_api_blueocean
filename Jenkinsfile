@@ -32,6 +32,15 @@ echo $EXIT_COD
 '''
           }
         }
+        stage('docker login') {
+          steps {
+            sh '''getToken=$(aws ecr get-login --no-include-email --region ap-northeast-2 --profile edrive-dev)
+
+getLogin=$($getToken)
+
+echo $get-login'''
+          }
+        }
       }
     }
     stage('create image') {
