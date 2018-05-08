@@ -34,28 +34,15 @@ echo $EXIT_COD
         }
       }
     }
-    stage('prepare to new') {
-      parallel {
-        stage('create image') {
-          steps {
-            sh '''cd $DOCKER_FILE
+    stage('create image') {
+      steps {
+        sh '''cd $DOCKER_FILE
 docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
-          }
-        }
-        stage('stop container') {
-          steps {
-            sh '''docker stop $CONTAINER_NAME || EXIT_CODE=$? && true ;
-echo $EXIT_CODE
-docker rm -f $CONTAINER_NAME || EXIT_CODE=$? && true ;
-echo $EXIT_CODE
-'''
-          }
-        }
       }
     }
-    stage('start container') {
+    stage('aws codedeploy') {
       steps {
-        sh 'docker run -it -d -p 8080:8080 -v /home/ec2-user/volume/logs:/usr/local/tomcat/logs --name $CONTAINER_NAME $ECR_REGISTRY/$ECR_REPO:latest'
+        build '/edrive-api/02. edrive_api_deploy_dev'
       }
     }
   }
