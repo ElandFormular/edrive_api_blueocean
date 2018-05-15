@@ -14,7 +14,7 @@ pipeline {
     }
     stage('build source') {
       steps {
-        sh '''cd $WORKSPACE/trunk/edrive-api/
+        sh '''cd "$WORKSPACE/trunk/edrive-api/"
 $M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
       }
     }
@@ -45,7 +45,7 @@ echo $get-login'''
     }
     stage('create image') {
       steps {
-        sh '''cd $DOCKER_FILE
+        sh '''cd "$DOCKER_FILE"
 docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
       }
     }
