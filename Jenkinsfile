@@ -57,7 +57,7 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
   }
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
-    M2_HOME = '/usr/share/apache-maven'
+    M2_HOME = '/usr/share/apache-maven/bin'
     DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = 'noregistry'
     BUILD_TYPE = 'dev'
