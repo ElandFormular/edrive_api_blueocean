@@ -15,7 +15,7 @@ pipeline {
     stage('build source') {
       steps {
         sh '''cd "$WORKSPACE/trunk/edrive-api/"
-$M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
+$M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
       }
     }
     stage('prepare to upload') {
@@ -57,7 +57,7 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
   }
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
-    M2_HOME = '/usr/share/apache-maven/bin'
+    M2_HOME = '/usr/share/apache-maven'
     DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = 'noregistry'
     BUILD_TYPE = 'dev'
