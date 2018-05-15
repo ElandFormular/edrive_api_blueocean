@@ -34,7 +34,7 @@ echo $EXIT_COD
         }
         stage('docker login') {
           steps {
-            sh '''getToken=$(aws --profile edrive-dev ecr get-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws --profile edrive-api-dev ecr get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
@@ -56,8 +56,8 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
     }
   }
   environment {
-    JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
-    M2_HOME = '/usr/local/maven/bin'
+    JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
+    M2_HOME = '/usr/share/apache-maven'
     DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = 'noregistry'
     BUILD_TYPE = 'dev'
