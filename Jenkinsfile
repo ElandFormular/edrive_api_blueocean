@@ -51,7 +51,20 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
     }
     stage('aws codedeploy') {
       steps {
-        build '/edrive-api/02. edrive_api_deploy_dev'
+        sh '''PROFILE_NAME=edrive-api-dev
+APPLICATION_NAME=edrive-qd-fileservice
+S3BUCKET=edrive-dev-codedeploy
+S3FOLDER=fileservice-api-dev
+S3EXTENSION=zip
+S3FILE=${BUILD_NUMBER}-${BUILD_ID}.${S3EXTENSION}
+DEPLOY_GROUP=dev
+DEPLOY_CONFIG=CodeDeployDefault.AllAtOnce
+
+
+rsync -avz  "${WORKSPACE}/edrive-api/deploy_script/" "${CODEDEPLOY_PATH}/deploy_script/"
+rsync -avz  "${WORKSPACE}/edrive-api/*.yml" "${CODEDEPLOY_PATH}/"
+aws deploy --profile $PROFILE_NAME push --application-name $APPLICATION_NAME --s3-location "s3://${S3BUCKET}/fileservice-api-dev/#100-9020272551422205410.zip" --source "${CODEDEPLOY_PATH}"
+aws deploy --profile $PROFILE_NAME create-deployment --application-name $APPLICATION_NAME --deployment-group-name $DEPLOY_GROUP --deployment-config-name $DEPLOY_CONFIG --s3-location bundleType="${S3EXTENSION}",bucket="${S3BUCKET}",key="${S3FOLDER}/${S3FILE}"'''
       }
     }
   }
@@ -63,6 +76,7 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
     BUILD_TYPE = 'dev'
     ECR_REPO = 'eland-dev-edrive-api/repo'
     CONTAINER_NAME = 'edrive-api-dev'
+    CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
   }
   triggers {
     pollSCM('H/5 * * * *')
