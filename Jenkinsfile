@@ -15,7 +15,7 @@ pipeline {
     stage('build source') {
       steps {
         sh '''cd "$WORKSPACE/trunk/edrive-api/"
-$M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
+$M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
       }
     }
     stage('prepare to upload') {
