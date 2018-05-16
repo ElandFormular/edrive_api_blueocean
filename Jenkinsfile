@@ -63,7 +63,7 @@ DEPLOY_CONFIG=CodeDeployDefault.AllAtOnce
 
 rsync -avz  $WORKSPACE/deploy_script/ $CODEDEPLOY_PATH/deploy_script/
 rsync -avz  $WORKSPACE/*.yml $CODEDEPLOY_PATH/
-aws deploy --profile $PROFILE_NAME push --application-name $APPLICATION_NAME --s3-location "s3://${S3BUCKET}/fileservice-api-dev/#100-9020272551422205410.zip" --source "${CODEDEPLOY_PATH}"
+aws deploy --profile $PROFILE_NAME push --application-name $APPLICATION_NAME --s3-location "s3://${S3BUCKET}/${S3FOLDER}/${S3FILE}" --source "${CODEDEPLOY_PATH}"
 aws deploy --profile $PROFILE_NAME create-deployment --application-name $APPLICATION_NAME --deployment-group-name $DEPLOY_GROUP --deployment-config-name $DEPLOY_CONFIG --s3-location bundleType="${S3EXTENSION}",bucket="${S3BUCKET}",key="${S3FOLDER}/${S3FILE}"'''
       }
     }
