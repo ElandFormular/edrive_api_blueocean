@@ -75,7 +75,6 @@ status(){
     DEPLOY_STATUS=$(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.[status]" --output text)
   else
     echo -n -e "\\e[00;31mCodeDeploy is not running (Or Invalid deployment id)\\e[00m"
-    return 3
   fi
 }
 
@@ -105,10 +104,8 @@ then
     echo -n -e "\\n\\e[00;31mCodeDeploy End\\e[00m"
     echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
   fi
-  sleep 1
 else
   echo -e "\\e[00;31mCodeDeploy is not running\\e[00m"
-  sleep 1
 fi'''
       }
     }
