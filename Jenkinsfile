@@ -84,7 +84,7 @@ then
   let wait=$SHUTDOWN_WAIT
   count=0;
   status
-  while [ $count -gt $wait ]
+  until [ $count -gt $wait ]
   do    
     sleep 1
     let count=$count+1;
