@@ -94,7 +94,7 @@ then
     echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m"
   done
 
-  if [ "$DEPLOY_STATUS" = "Succeeded" ]; 
+  if [ "$DEPLOY_STATUS" == "Succeeded" ]; 
   then
     echo -n -e "\\n\\e[00;31mCodeDeploy Succeeded\\e[00m"    
   elif [ "$DEPLOY_STATUS" == "Failed" ]; 
