@@ -51,7 +51,10 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
     }
     stage('aws codedeploy') {
       steps {
-        sh '''PROFILE_NAME=edrive-api-dev
+        sh '''#!/bin/bash
+
+#SHUTDOWN_WAIT is wait time in seconds for deploy proccess to stop
+PROFILE_NAME=edrive-api-dev
 APPLICATION_NAME=edrive-qd-fileservice
 S3BUCKET=edrive-dev-codedeploy
 S3FOLDER=fileservice-api-dev
@@ -59,12 +62,53 @@ S3EXTENSION=zip
 S3FILE=${BUILD_NUMBER}-${BUILD_ID}.${S3EXTENSION}
 DEPLOY_GROUP=dev
 DEPLOY_CONFIG=CodeDeployDefault.AllAtOnce
+SHUTDOWN_WAIT=600
+DEPLOYMENT_ID=""
+DEPLOY_STATUS=""
 
-
-rsync -avz  $WORKSPACE/deploy_script/ $CODEDEPLOY_PATH/deploy_script/
-rsync -avz  $WORKSPACE/*.yml $CODEDEPLOY_PATH/
 aws deploy --profile $PROFILE_NAME push --application-name $APPLICATION_NAME --s3-location "s3://${S3BUCKET}/${S3FOLDER}/${S3FILE}" --source "${CODEDEPLOY_PATH}"
-aws deploy --profile $PROFILE_NAME create-deployment --application-name $APPLICATION_NAME --deployment-group-name $DEPLOY_GROUP --deployment-config-name $DEPLOY_CONFIG --s3-location bundleType="${S3EXTENSION}",bucket="${S3BUCKET}",key="${S3FOLDER}/${S3FILE}"'''
+DEPLOYMENT_ID=$(aws deploy --profile $PROFILE_NAME create-deployment --application-name $APPLICATION_NAME --deployment-group-name $DEPLOY_GROUP --deployment-config-name $DEPLOY_CONFIG --s3-location bundleType="${S3EXTENSION}",bucket="${S3BUCKET}",key="${S3FOLDER}/${S3FILE}" --query "deploymentId" --output text)
+
+status(){
+  #check codedeploy status
+  if [ -n "$DEPLOYMENT_ID" ]
+  then 
+    DEPLOY_STATUS=$(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.[status]" --output text)
+  else
+    echo -n -e "\\e[00;31mCodeDeploy is not running (Or Invalid deployment id)\\e[00m"
+    return 3
+  fi
+}
+
+if [ -n "$DEPLOYMENT_ID" ]
+then  
+  echo -e "\\e[00;31mStart CodeDeploy : $DEPLOYMENT_ID\\e[00m"
+
+  let wait=$SHUTDOWN_WAIT
+  count=0;
+  status
+  until [ $DEPLOY_STATUS = \'Failed\' ] || [ $DEPLOY_STATUS = \'Succeeded\' ] || [ $count -gt $kwait ]
+  do    
+    sleep 1
+    let count=$count+1;
+    echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m";
+    status
+  done
+
+  if [ $DEPLOY_STATUS = \'Succeeded\' ]; 
+  then
+    echo -n -e "\\n\\e[00;31mCodeDeploy Succeeded\\e[00m"    
+  elif [ $DEPLOY_STATUS = \'Failed\' ]; 
+  then
+    echo -n -e "\\n\\e[00;31mCodeDeploy Failed\\e[00m"
+    echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
+  else 
+    echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
+  fi
+
+else
+  echo -e "\\e[00;31mCodeDeploy is not running\\e[00m"
+fi'''
       }
     }
   }
