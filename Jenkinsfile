@@ -53,7 +53,6 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
       steps {
         sh '''#!/bin/bash
 
-#SHUTDOWN_WAIT is wait time in seconds for deploy proccess to stop
 PROFILE_NAME=edrive-api-dev
 APPLICATION_NAME=edrive-qd-fileservice
 S3BUCKET=edrive-dev-codedeploy
@@ -87,22 +86,23 @@ then
   let wait=$SHUTDOWN_WAIT
   count=0;
   status
-  until [ $DEPLOY_STATUS = \'Failed\' ] || [ $DEPLOY_STATUS = \'Succeeded\' ] || [ $count -gt $kwait ]
+  until [ "$DEPLOY_STATUS" == "Succeeded" ] || [ "$DEPLOY_STATUS" = "Failed" ] || [ $count -gt $wait ]
   do    
     sleep 1
     let count=$count+1;
-    echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m";
     status
+    echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m"
   done
 
-  if [ $DEPLOY_STATUS = \'Succeeded\' ]; 
+  if [ "$DEPLOY_STATUS" = "Succeeded" ]; 
   then
     echo -n -e "\\n\\e[00;31mCodeDeploy Succeeded\\e[00m"    
-  elif [ $DEPLOY_STATUS = \'Failed\' ]; 
+  elif [ "$DEPLOY_STATUS" == "Failed" ]; 
   then
     echo -n -e "\\n\\e[00;31mCodeDeploy Failed\\e[00m"
     echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
   else 
+    echo -n -e "\\n\\e[00;31mCodeDeploy End\\e[00m"
     echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
   fi
 
