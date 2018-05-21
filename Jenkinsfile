@@ -90,8 +90,11 @@ then
     let count=$count+1;
     status
     echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m"
+    echo exit $?
   done
-  echo -n -e "\\n\\e[00;31mCodeDeploy End : $DEPLOY_STATUS\\e[00m"
+
+
+  echo -n -e "\\n\\e[00;31mEnd CodeDeploy : $DEPLOY_STATUS\\e[00m"
 
   if [ "$DEPLOY_STATUS" != "Succeeded" ]
   then
