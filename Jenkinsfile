@@ -84,16 +84,12 @@ then
   let wait=$SHUTDOWN_WAIT
   count=0;
   status
-  until [ $count -gt $wait ]
+  until [ "$DEPLOY_STATUS" = "Succeeded" ] || [ "$DEPLOY_STATUS" = "Failed" ] ||[ $count -gt $wait ]
   do    
     sleep 1
     let count=$count+1;
     status
     echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m"
-    if [ "$DEPLOY_STATUS" == "Succeeded" ] || [ "$DEPLOY_STATUS" == "Failed" ] 
-    then
-      break
-    fi
   done
 
   echo -n -e "\\n\\e[00;31mEnd CodeDeploy : $DEPLOY_STATUS\\e[00m"
