@@ -55,16 +55,6 @@ docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
 aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
       }
     }
-    stage('deploy new image') {
-      steps {
-        sh '''#aws ecs update-service --cluster edrive-api-stage-cluster --service edrive-api-stage-service --force-new-deployment
-tasks=$(aws ecs list-tasks --cluster edrive-api-stage-cluster --family edirve-api-stage-td --query taskArns --output text)
-
-for task in $tasks
-  do aws ecs stop-task --cluster edrive-api-stage-cluster --task $task
-done'''
-      }
-    }
   }
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
