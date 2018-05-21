@@ -15,15 +15,13 @@ pipeline {
     stage('junit test') {
       steps {
         sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=$BUILD_TYPE test'''
+$M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE test'''
       }
     }
   }
   environment {
-    JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
+    JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
     M2_HOME = '/usr/share/apache-maven'
-    DOCKER_FILE = '/home/ec2-user/docker'
-    ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com/eland-dev-edrive-api/repo'
     BUILD_TYPE = 'dev'
   }
   triggers {
