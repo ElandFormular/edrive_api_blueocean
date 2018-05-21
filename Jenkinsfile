@@ -69,7 +69,6 @@ aws deploy --profile $PROFILE_NAME push --application-name $APPLICATION_NAME --s
 DEPLOYMENT_ID=$(aws deploy --profile $PROFILE_NAME create-deployment --application-name $APPLICATION_NAME --deployment-group-name $DEPLOY_GROUP --deployment-config-name $DEPLOY_CONFIG --s3-location bundleType="${S3EXTENSION}",bucket="${S3BUCKET}",key="${S3FOLDER}/${S3FILE}" --query "deploymentId" --output text)
 
 status(){
-  #check codedeploy status
   if [ -n "$DEPLOYMENT_ID" ]
   then 
     DEPLOY_STATUS=$(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.[status]" --output text)
@@ -92,16 +91,11 @@ then
     status
     echo -n -e "\\n\\e[00;31mwaiting for deploy processes : $DEPLOY_STATUS\\e[00m"
   done
+  echo -n -e "\\n\\e[00;31mCodeDeploy End : $DEPLOY_STATUS\\e[00m"
 
-  if [ "$DEPLOY_STATUS" == "Succeeded" ]; 
+  if [ "$DEPLOY_STATUS" != "Succeeded" ]
   then
-    echo -n -e "\\n\\e[00;31mCodeDeploy Succeeded\\e[00m"    
-  elif [ "$DEPLOY_STATUS" == "Failed" ]; 
-  then
-    echo -n -e "\\n\\e[00;31mCodeDeploy Failed\\e[00m"
-    echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
-  else 
-    echo -n -e "\\n\\e[00;31mCodeDeploy End\\e[00m"
+    echo -n -e "ERROR CODE >>> "
     echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
   fi
 else
