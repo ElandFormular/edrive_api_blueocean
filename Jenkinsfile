@@ -44,10 +44,9 @@ echo $EXIT_CODE'''
           steps {
             sh '''sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
-rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
-cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
-cp -rf "${WORKSPACE}/deploy_scripts/codedeploy/start_container_prd.sh" "${WORKSPACE}/deploy_scripts/codedeploy/start_container.sh"
-'''
+rsync -avzhr --delete "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
+cp -rf "${DEPLOY_SCRIPTS}/codedeploy/appspec.prd.yml" "${DEPLOY_SCRIPTS}/codedeploy/appspec.yml"
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
           }
         }
       }
