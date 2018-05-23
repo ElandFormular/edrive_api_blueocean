@@ -67,7 +67,7 @@ docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
         stage('delete untagged') {
           steps {
             sh '''IMAGES_TO_DELETE=$(aws ecr --profile $ECR_PROFILE_NAME list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
-aws ecr --profile $ECR_PROFILEbatch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
+aws ecr --profile $ECR_PROFILE_NAME batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
           }
         }
         stage('create spot fleet') {
