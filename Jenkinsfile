@@ -114,6 +114,7 @@ then
   then
     echo -n -e "ERROR CODE >>> "
     echo -n -e $(aws deploy --profile $PROFILE_NAME get-deployment --deployment-id $DEPLOYMENT_ID --query "deploymentInfo.errorInformation.code" --output text)
+    exit 1
   fi
 else
   echo -e "\\e[00;31mCodeDeploy is not running\\e[00m"
