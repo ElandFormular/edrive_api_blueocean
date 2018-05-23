@@ -13,9 +13,21 @@ pipeline {
       }
     }
     stage('build source') {
-      steps {
-        sh '''cd $WORKSPACE/trunk/edrive-api/
+      parallel {
+        stage('build source') {
+          steps {
+            sh '''cd $WORKSPACE/trunk/edrive-api/
 $M2_HOME/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
+          }
+        }
+        stage('create spot instance') {
+          steps {
+            sh '''nextDay=($date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')
+rsync -avzh "${WORKSPACE}/deploy_script/" "${DEPLOY_SCRIPTS}/"
+sed -e s/{{NEXTDATETIME}}/${nextDay}/g "${WORKSPACE}/deploy_script/stage_instance_spec.json" > "${DEPLOY_SCRIPTS}/aws_scripts"
+ '''
+          }
+        }
       }
     }
     stage('prepare to upload') {
@@ -59,10 +71,10 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
     M2_HOME = '/usr/share/apache-maven'
-    DOCKER_FILE = '/home/ec2-user/docker'
     ECR_REGISTRY = '595483153913.dkr.ecr.ap-northeast-2.amazonaws.com'
     BUILD_TYPE = 'prd'
     ECR_REPO = 'edrive-api-prd/repo'
     TAG = 'staging'
+    DEPLOY_SCRIPTS = '/home/ec2-user/deploy_scripts'
   }
 }
