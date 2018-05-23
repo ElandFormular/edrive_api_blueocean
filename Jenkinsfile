@@ -55,7 +55,7 @@ echo $get-login'''
         }
         stage('volume permission') {
           steps {
-            sh 'chmod -R 755 $VOLUME_DIR/'
+            sh 'sudo chmod -R 755 $VOLUME_DIR/'
           }
         }
       }
