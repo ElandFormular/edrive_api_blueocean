@@ -57,8 +57,7 @@ echo $get-login'''
     }
     stage('create image') {
       steps {
-        sh '''cd "${SOURCE_DIR}/docker"
-docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
+        sh 'docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ${DEPLOY_SCRIPTS}/docker/edrive/Dockerfile ${SOURCE_DIR}'
       }
     }
     stage('aws codedeploy') {
