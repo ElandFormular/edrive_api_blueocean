@@ -13,21 +13,9 @@ pipeline {
       }
     }
     stage('build source') {
-      parallel {
-        stage('build source') {
-          steps {
-            sh '''cd "$WORKSPACE/trunk/edrive-api/"
+      steps {
+        sh '''cd "$WORKSPACE/trunk/edrive-api/"
 $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
-          }
-        }
-        stage('prepare to scripts') {
-          steps {
-            sh '''sudo chown -R ec2-user:ec2-user $WORKSPACE/
-sudo chmod -R 755 $WORKSPACE/
-rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
-cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
-          }
-        }
       }
     }
     stage('prepare to upload') {
@@ -56,6 +44,14 @@ echo $get-login'''
         stage('volume permission') {
           steps {
             sh 'sudo chmod -R 755 $VOLUME_DIR/'
+          }
+        }
+        stage('prepare to scripts') {
+          steps {
+            sh '''sudo chown -R ec2-user:ec2-user $WORKSPACE/
+sudo chmod -R 755 $WORKSPACE/
+rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
           }
         }
       }
