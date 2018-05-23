@@ -119,7 +119,7 @@ fi'''
   environment {
     JAVA_HOME = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-7.b10.37.amzn1.x86_64'
     M2_HOME = '/usr/share/apache-maven'
-    DOCKER_FILE = '/home/ec2-user/docker'
+    DEPLOY_SCRIPTS = '/home/ec2-user/deploy_scripts'
     ECR_REGISTRY = 'noregistry'
     BUILD_TYPE = 'dev'
     ECR_REPO = 'eland-dev-edrive-api/repo'
