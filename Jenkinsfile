@@ -53,6 +53,11 @@ getLogin=$($getToken)
 echo $get-login'''
           }
         }
+        stage('volume permission') {
+          steps {
+            sh 'chmod -R 755 $VOLUME_DIR/'
+          }
+        }
       }
     }
     stage('create image') {
@@ -126,6 +131,7 @@ fi'''
     CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
     SOURCE_DIR = '/home/ec2-user/source'
     PROFILE_NAME = 'edrive-api-dev'
+    VOLUME_DIR = '/home/ec2-user/volume'
   }
   triggers {
     pollSCM('H/5 * * * *')
