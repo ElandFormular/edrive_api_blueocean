@@ -28,7 +28,7 @@ sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
 rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
 cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
-sed -e s/{{NEXTDATETIME}}/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
+sed -e s/NEXTDATETIME/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
           }
         }
       }
@@ -37,7 +37,7 @@ sed -e s/{{NEXTDATETIME}}/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spe
       parallel {
         stage('login for aws') {
           steps {
-            sh '''getToken=$(aws ecr get-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws --profile edrive-api-dev ecr get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
