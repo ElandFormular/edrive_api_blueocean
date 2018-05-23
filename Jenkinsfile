@@ -34,7 +34,7 @@ echo $EXIT_COD
         }
         stage('docker login') {
           steps {
-            sh '''getToken=$(aws --profile $PROFILE_NAME ecr get-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAME get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
@@ -132,6 +132,7 @@ fi'''
     SOURCE_DIR = '/home/ec2-user/source'
     PROFILE_NAME = 'edrive-api-dev'
     VOLUME_DIR = '/home/ec2-user/volume'
+    ECR_PROFILE_NAME = 'edrive-api-dev'
   }
   triggers {
     pollSCM('H/5 * * * *')
