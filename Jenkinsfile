@@ -17,18 +17,18 @@ pipeline {
         stage('build source') {
           steps {
             sh '''cd $WORKSPACE/trunk/edrive-api/
-$M2_HOME/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
+$M2_HOME/bin/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
           }
         }
         stage('prepare to scripts') {
           steps {
-            sh '''nextDay=($date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')
+            sh '''nextday="$(date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
 
 sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
 rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
 cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
-sed -e s/{{NEXTDATETIME}}/${nextDay}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
+sed -e s/{{NEXTDATETIME}}/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
           }
         }
       }
