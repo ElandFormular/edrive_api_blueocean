@@ -25,7 +25,7 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=tr
             sh '''sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
 rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
-rsync -avzh "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
           }
         }
       }
