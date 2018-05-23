@@ -56,6 +56,8 @@ cp -rf "${DEPLOY_SCRIPTS}/batch/bizlog-s3-upload.sh" "${DEPLOY_SCRIPTS}/codedepl
       steps {
         sh '''cd "${DEPLOY_SCRIPTS}"
 docker build -t $ECR_REGISTRY/$ECR_REPO:${TAG} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./docker/edrive/Dockerfile ../
+docker tag $ECR_REGISTRY/$ECR_REPO:${TAG} $ECR_REGISTRY/$ECR_REPO:latest
+docker push $ECR_REGISTRY/$ECR_REPO:latest
 docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
       }
     }
