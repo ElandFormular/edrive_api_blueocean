@@ -22,7 +22,7 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=
       parallel {
         stage('login for aws') {
           steps {
-            sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAMEget-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAME get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
