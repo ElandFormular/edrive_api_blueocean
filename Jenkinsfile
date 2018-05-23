@@ -20,12 +20,15 @@ pipeline {
 $M2_HOME/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
           }
         }
-        stage('create spot instance') {
+        stage('prepare to scripts') {
           steps {
             sh '''nextDay=($date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')
-rsync -avzh "${WORKSPACE}/deploy_script/" "${DEPLOY_SCRIPTS}/"
-sed -e s/{{NEXTDATETIME}}/${nextDay}/g "${WORKSPACE}/deploy_script/stage_instance_spec.json" > "${DEPLOY_SCRIPTS}/aws_scripts"
- '''
+
+sudo chown -R ec2-user:ec2-user $WORKSPACE/
+sudo chmod -R 755 $WORKSPACE/
+rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
+sed -e s/{{NEXTDATETIME}}/${nextDay}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
           }
         }
       }
@@ -43,7 +46,7 @@ echo $get-login'''
         }
         stage('move war file') {
           steps {
-            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/${BUILD_TYPE}/"'
+            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "${SOURCE_DIR}/${BUILD_TYPE}/"'
           }
         }
         stage('tag old image') {
@@ -56,8 +59,8 @@ echo $EXIT_CODE'''
     }
     stage('create image') {
       steps {
-        sh '''cd $DOCKER_FILE
-docker build -t $ECR_REGISTRY/$ECR_REPO:${TAG} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./
+        sh '''cd "${DEPLOY_SCRIPTS}"
+docker build -t $ECR_REGISTRY/$ECR_REPO:${TAG} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./docker/edrive/Dockerfile ../
 docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
       }
     }
@@ -76,5 +79,8 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     ECR_REPO = 'edrive-api-prd/repo'
     TAG = 'staging'
     DEPLOY_SCRIPTS = '/home/ec2-user/deploy_scripts'
+    SOURCE_DIR = '/home/ec2-user/source'
+    CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
+    PROFILE_NAME = 'edrive-api-prd'
   }
 }
