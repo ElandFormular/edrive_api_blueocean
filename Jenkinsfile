@@ -13,16 +13,26 @@ pipeline {
       }
     }
     stage('build source') {
-      steps {
-        sh '''cd "$WORKSPACE/trunk/edrive-api/"
+      parallel {
+        stage('build source') {
+          steps {
+            sh '''cd "$WORKSPACE/trunk/edrive-api/"
 $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=true package'''
+          }
+        }
+        stage('prepare to scripts') {
+          steps {
+            sh '''rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
+rsync -avzh "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
+          }
+        }
       }
     }
     stage('prepare to upload') {
       parallel {
         stage('move war file') {
           steps {
-            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "/home/ec2-user/docker/source/${BUILD_TYPE}/"'
+            sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "${SOURCE_DIR}/${BUILD_TYPE}/"'
           }
         }
         stage('tag old image') {
@@ -34,7 +44,7 @@ echo $EXIT_COD
         }
         stage('docker login') {
           steps {
-            sh '''getToken=$(aws --profile edrive-api-dev ecr get-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws --profile $PROFILE_NAME ecr get-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
@@ -45,7 +55,7 @@ echo $get-login'''
     }
     stage('create image') {
       steps {
-        sh '''cd "$DOCKER_FILE"
+        sh '''cd "${SOURCE_DIR}/docker"
 docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./edrive/Dockerfile ./'''
       }
     }
@@ -53,13 +63,12 @@ docker build -t $ECR_REGISTRY/$ECR_REPO:latest --force-rm=false --pull=true --bu
       steps {
         sh '''#!/bin/bash
 
-PROFILE_NAME=edrive-api-dev
 APPLICATION_NAME=edrive-qd-fileservice
 S3BUCKET=edrive-dev-codedeploy
 S3FOLDER=fileservice-api-dev
 S3EXTENSION=zip
 S3FILE=${BUILD_NUMBER}-${BUILD_ID}.${S3EXTENSION}
-DEPLOY_GROUP=dev
+DEPLOY_GROUP=$BUILD_TYPE
 DEPLOY_CONFIG=CodeDeployDefault.AllAtOnce
 SHUTDOWN_WAIT=600
 DEPLOYMENT_ID=""
@@ -114,6 +123,8 @@ fi'''
     ECR_REPO = 'eland-dev-edrive-api/repo'
     CONTAINER_NAME = 'edrive-api-dev'
     CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
+    SOURCE_DIR = '/home/ec2-user/source'
+    PROFILE_NAME = 'edrive-api-dev'
   }
   triggers {
     pollSCM('H/5 * * * *')
