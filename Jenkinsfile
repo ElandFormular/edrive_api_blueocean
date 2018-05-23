@@ -13,31 +13,16 @@ pipeline {
       }
     }
     stage('build source') {
-      parallel {
-        stage('build source') {
-          steps {
-            sh '''cd $WORKSPACE/trunk/edrive-api/
+      steps {
+        sh '''cd $WORKSPACE/trunk/edrive-api/
 $M2_HOME/bin/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=true package'''
-          }
-        }
-        stage('prepare to scripts') {
-          steps {
-            sh '''nextday="$(date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
-
-sudo chown -R ec2-user:ec2-user $WORKSPACE/
-sudo chmod -R 755 $WORKSPACE/
-rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
-cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
-sed -e s/NEXTDATETIME/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
-          }
-        }
       }
     }
     stage('prepare to upload') {
       parallel {
         stage('login for aws') {
           steps {
-            sh '''getToken=$(aws --profile edrive-api-dev ecr get-login --no-include-email --region ap-northeast-2)
+            sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAMEget-login --no-include-email --region ap-northeast-2)
 
 getLogin=$($getToken)
 
@@ -49,15 +34,28 @@ echo $get-login'''
             sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "${SOURCE_DIR}/${BUILD_TYPE}/"'
           }
         }
-        stage('tag old image') {
+        stage('remove old image') {
           steps {
             sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:${TAG} || EXIT_CODE=$? && true ;
 echo $EXIT_CODE'''
           }
         }
+        stage('prepare to scripts') {
+          steps {
+            sh '''nextday="$(date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
+
+sudo chown -R ec2-user:ec2-user $WORKSPACE/
+sudo chmod -R 755 $WORKSPACE/
+rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
+sed -i s/NEXTDATETIME/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"
+
+cat "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
+          }
+        }
       }
     }
-    stage('create image') {
+    stage('create new image') {
       steps {
         sh '''cd "${DEPLOY_SCRIPTS}"
 docker build -t $ECR_REGISTRY/$ECR_REPO:${TAG} --force-rm=false --pull=true --build-arg BUILD_TYPE=$BUILD_TYPE -f ./docker/edrive/Dockerfile ../
@@ -65,9 +63,19 @@ docker push $ECR_REGISTRY/$ECR_REPO:${TAG}'''
       }
     }
     stage('delete untagged') {
-      steps {
-        sh '''IMAGES_TO_DELETE=$( aws ecr list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
-aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
+      parallel {
+        stage('delete untagged') {
+          steps {
+            sh '''IMAGES_TO_DELETE=$(aws ecr --profile $ECR_PROFILE_NAME list-images --repository-name $ECR_REPO --filter "tagStatus=UNTAGGED" --query \'imageIds[*]\' --output json )
+aws ecr --profile $ECR_PROFILEbatch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_DELETE" || true'''
+          }
+        }
+        stage('create spot fleet') {
+          steps {
+            sh '''cd "${DEPLOY_SCRIPTS}/aws/"
+aws ec2 --profile $PROFILE_NAME request-spot-fleet --spot-fleet-request-config file://stage_instance_spec.json'''
+          }
+        }
       }
     }
   }
@@ -82,5 +90,6 @@ aws ecr batch-delete-image --repository-name $ECR_REPO --image-ids "$IMAGES_TO_D
     SOURCE_DIR = '/home/ec2-user/source'
     CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
     PROFILE_NAME = 'edrive-api-prd'
+    ECR_PROFILE_NAME = 'edrive-api-dev'
   }
 }
