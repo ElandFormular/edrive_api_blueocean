@@ -46,7 +46,7 @@ echo $EXIT_CODE'''
 sudo chmod -R 755 $WORKSPACE/
 rsync -avzhr --delete "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
 cp -rf "${DEPLOY_SCRIPTS}/codedeploy/appspec.prd.yml" "${DEPLOY_SCRIPTS}/codedeploy/appspec.yml"
-cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
+cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
 cp -rf "${DEPLOY_SCRIPTS}/batch/bizlog-s3-upload.sh" "${DEPLOY_SCRIPTS}/codedeploy/bizlog-s3-upload.sh"'''
           }
         }
