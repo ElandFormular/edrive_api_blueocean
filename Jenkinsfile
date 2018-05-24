@@ -50,6 +50,11 @@ cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv
 cp -rf "${DEPLOY_SCRIPTS}/batch/bizlog-s3-upload.sh" "${DEPLOY_SCRIPTS}/codedeploy/bizlog-s3-upload.sh"'''
           }
         }
+        stage('volume permission') {
+          steps {
+            sh 'sudo chmod -R 755 $VOLUME_DIR/'
+          }
+        }
       }
     }
     stage('create new image') {
@@ -137,5 +142,6 @@ fi'''
     PROFILE_NAME = 'edrive-api-prd'
     ECR_PROFILE_NAME = 'edrive-api-dev'
     BUILD_TYPE = 'prd'
+    VOLUME_DIR = '/home/ec2-user/volume'
   }
 }
