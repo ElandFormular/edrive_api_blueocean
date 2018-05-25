@@ -42,12 +42,15 @@ echo $EXIT_CODE'''
         }
         stage('prepare to scripts') {
           steps {
-            sh '''nextday="$(date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
+            sh '''currentday="$(date "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
+nextday="$(date --date="1 day" "+%FT%T.%N" | sed -r \'s/[[:digit:]]{7}$/Z/\')"
 
 sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
 rsync -avzh "${WORKSPACE}/deploy_scripts/" "${DEPLOY_SCRIPTS}/"
 cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"
+
+sed -i s/CURRENTDATETIME/${currentday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"
 sed -i s/NEXTDATETIME/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"
 
 cat "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
