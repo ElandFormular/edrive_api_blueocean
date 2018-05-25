@@ -42,8 +42,8 @@ echo $EXIT_CODE'''
         }
         stage('prepare to scripts') {
           steps {
-            sh '''currentday="$(date "+%FT%T.%2NZ")"
-nextday="$(date --date="1 day" "+%FT%T.%2NZ")"
+            sh '''currentday="$(date "+%FT%TZ")"
+nextday="$(date --date="1 day" "+%FT%TZ")"
 
 sudo chown -R ec2-user:ec2-user $WORKSPACE/
 sudo chmod -R 755 $WORKSPACE/
