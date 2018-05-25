@@ -20,7 +20,7 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=${BUILD_TYPE} -Dmaven.test.skip=
     }
     stage('prepare to upload') {
       parallel {
-        stage('login for aws') {
+        stage('docker login') {
           steps {
             sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAME get-login --no-include-email --region ap-northeast-2)
 
@@ -51,6 +51,11 @@ cp -rf "${DEPLOY_SCRIPTS}/was/setenv_prd.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv
 sed -i s/NEXTDATETIME/${nextday}/g "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"
 
 cat "${DEPLOY_SCRIPTS}/aws/stage_instance_spec.json"'''
+          }
+        }
+        stage('volume permission') {
+          steps {
+            sh 'sudo chmod -R 755 $VOLUME_DIR/'
           }
         }
       }
@@ -91,5 +96,6 @@ aws ec2 --profile $PROFILE_NAME request-spot-fleet --spot-fleet-request-config f
     CODEDEPLOY_PATH = '/home/ec2-user/codedeploy'
     PROFILE_NAME = 'edrive-api-prd'
     ECR_PROFILE_NAME = 'edrive-api-dev'
+    VOLUME_DIR = '/home/ec2-user/volume'
   }
 }
