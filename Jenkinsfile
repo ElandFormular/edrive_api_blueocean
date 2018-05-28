@@ -4,7 +4,12 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
-
+  }
+  input {
+    message "Git Tag Number(ex, 1.00)?"
+    parameters {
+      string(name: 'GitTag', defaultValue: '1.00', description: 'Git Tag For Deploy')
+    }
   }
   stages {
     stage('pull source') {
