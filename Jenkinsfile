@@ -27,7 +27,7 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=tr
         }
         stage('remove old image') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
+            sh '''docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
 echo $EXIT_COD
 '''
           }
