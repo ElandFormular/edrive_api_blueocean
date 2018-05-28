@@ -4,9 +4,9 @@ pipeline {
       label 'edrive_api_node'
       customWorkspace '/home/ec2-user/jenkins/workspace/edrive-api'
     }
-    parameters {
-        string(name: 'GitTag', defaultValue: '1.0', description: 'Git Tag For Deploy')
-    }
+  }
+  parameters {
+    string(name: 'GitTag', defaultValue: '1.0', description: 'Git Tag For Deploy')
   }
   stages {
     stage('pull source') {
