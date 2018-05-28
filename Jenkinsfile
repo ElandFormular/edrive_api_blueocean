@@ -15,7 +15,7 @@ pipeline {
         }
       }
       steps {
-        git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'master/tags/1.00', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
+        git(url: 'http://10.123.180.232:8090/scm/git/2017/edrive_Api_Project', branch: 'master/tags/1.0', credentialsId: '347d447d-ae19-4798-84c0-cfa598960058')
       }
     }
     stage('build source') {
