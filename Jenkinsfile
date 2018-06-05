@@ -40,6 +40,9 @@ echo $get-login'''
 echo $EXIT_CODE
 
 docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+docker rmi -f $ECR_REGISTRY/$ECR_REPO:$TAG || EXIT_CODE=$? && true ;
 echo $EXIT_CODE'''
           }
         }
