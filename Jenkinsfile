@@ -25,13 +25,6 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE -Dmaven.test.skip=tr
             sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "${SOURCE_DIR}/${BUILD_TYPE}/"'
           }
         }
-        stage('remove old image') {
-          steps {
-            sh '''docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
-echo $EXIT_COD
-'''
-          }
-        }
         stage('docker login') {
           steps {
             sh '''getToken=$(aws ecr --profile $ECR_PROFILE_NAME get-login --no-include-email --region ap-northeast-2)
