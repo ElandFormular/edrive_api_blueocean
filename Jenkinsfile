@@ -54,7 +54,7 @@ cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv
 echo $EXIT_CODE
 
 docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
-echo $EXIT_COD'''
+echo $EXIT_CODE'''
           }
         }
       }
