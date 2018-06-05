@@ -135,6 +135,7 @@ fi'''
     PROFILE_NAME = 'edrive-api-dev'
     VOLUME_DIR = '/home/ec2-user/volume'
     ECR_PROFILE_NAME = 'edrive-api-dev'
+    CONTAINER_NAME = 'edrive-api'
   }
   triggers {
     pollSCM('H/5 * * * *')
