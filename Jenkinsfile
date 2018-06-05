@@ -48,6 +48,15 @@ cp -rf "${DEPLOY_SCRIPTS}/codedeploy/appspec.dev.yml" "${DEPLOY_SCRIPTS}/codedep
 cp -rf "${DEPLOY_SCRIPTS}/was/setenv_dev.sh" "${SOURCE_DIR}/${BUILD_TYPE}/setenv.sh"'''
           }
         }
+        stage('remove old docker') {
+          steps {
+            sh '''docker rm -f $CONTAINER_NAME || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
+echo $EXIT_COD'''
+          }
+        }
       }
     }
     stage('create image') {
