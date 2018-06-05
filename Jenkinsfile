@@ -34,9 +34,12 @@ echo $get-login'''
             sh 'cp -rf "${WORKSPACE}/trunk/edrive-api/target/ROOT.war" "${SOURCE_DIR}/${BUILD_TYPE}/"'
           }
         }
-        stage('remove old image') {
+        stage('remove old docker') {
           steps {
-            sh '''docker rmi $ECR_REGISTRY/$ECR_REPO:${TAG} || EXIT_CODE=$? && true ;
+            sh '''docker rm -f $CONTAINER_NAME || EXIT_CODE=$? && true ;
+echo $EXIT_CODE
+
+docker rmi -f $ECR_REGISTRY/$ECR_REPO:latest || EXIT_CODE=$? && true ;
 echo $EXIT_CODE'''
           }
         }
