@@ -8,14 +8,14 @@ pipeline {
   }
   stages {
     stage('input git tag') {
-      steps {
-        sh 'git tag'
-      }
       input {
         message 'Git Tag Number(ex, 1.00)?'
         parameters {
           string(name: 'GitTag', defaultValue: '1.00', description: 'Git Tag For Deploy')
         }
+      }
+      steps {
+        sh 'git tag '
       }
     }
     stage('pull source') {
