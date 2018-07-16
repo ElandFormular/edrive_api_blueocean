@@ -24,4 +24,5 @@ $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE test'''
     M2_HOME = '/usr/share/apache-maven'
     BUILD_TYPE = 'dev'
   }
+  
 }
