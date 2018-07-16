@@ -14,7 +14,8 @@ pipeline {
     }
     stage('junit test') {
       steps {
-        sh '''cd $WORKSPACE/trunk/edrive-api/
+        sh '''echo test start
+cd $WORKSPACE/trunk/edrive-api/
 $M2_HOME/bin/mvn clean -Dspring.profiles.active=$BUILD_TYPE test'''
       }
     }
